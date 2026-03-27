@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash,session
 from config import Config
 from models import db, User, UserProfile, Bookmark, Feedback
 from recommender import get_recommendations
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-
+from quiz import select_questions, score_quiz
+import json
 # ─────────────────────────────────────────────
 #  APP INIT
 # ─────────────────────────────────────────────
@@ -255,7 +256,60 @@ def feedback():
     flash("Thanks for your feedback!", "success")
     return redirect(url_for("dashboard"))
 
+# ─────────────────────────────────────────────
+#  QUIZ — START
+# ─────────────────────────────────────────────
+@app.route("/quiz")
+@login_required
+def quiz_start():
+    # Pull latest profile to personalise questions
+    profile = UserProfile.query.filter_by(user_id=current_user.id)\
+                                .order_by(UserProfile.created_at.desc()).first()
 
+    interests = profile.interests if profile else ""
+    skills    = profile.skills    if profile else ""
+
+    questions = select_questions(interests, skills, n=10)
+
+    # Store question ids in session so we can grade later
+    session["quiz_ids"] = [q["id"] for q in questions]
+
+    return render_template("quiz.html", questions=questions)
+
+
+# ─────────────────────────────────────────────
+#  QUIZ — SUBMIT
+# ─────────────────────────────────────────────
+@app.route("/quiz/submit", methods=["POST"])
+@login_required
+def quiz_submit():
+    from quiz_data import QUESTIONS
+
+    quiz_ids  = session.get("quiz_ids", [])
+    questions = [q for q in QUESTIONS if q["id"] in quiz_ids]
+
+    # Collect answers from form: field name = "ans_{question_id}"
+    answers = {}
+    for q in questions:
+        answers[str(q["id"])] = request.form.get(f"ans_{q['id']}", "").strip()
+
+    result = score_quiz(questions, answers)
+
+    # Store quiz level in session — used to annotate recommendations
+    session["quiz_level"] = result["level"]
+
+    return render_template("quiz_result.html", result=result)
+
+
+# ─────────────────────────────────────────────
+#  QUIZ — RETAKE
+# ─────────────────────────────────────────────
+@app.route("/quiz/retake")
+@login_required
+def quiz_retake():
+    session.pop("quiz_ids",  None)
+    session.pop("quiz_level", None)
+    return redirect(url_for("quiz_start"))
 # ─────────────────────────────────────────────
 #  RUN
 # ─────────────────────────────────────────────

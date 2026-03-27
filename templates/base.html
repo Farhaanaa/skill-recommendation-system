@@ -832,6 +832,12 @@
           class="{% if request.endpoint == 'profile' %}active{% endif %}"
           >Get Recommendations</a
         >
+        <a
+          href="{{ url_for('quiz_start') }}"
+          class="sidebar-link {% if request.endpoint in ['quiz_start','quiz_submit','quiz_retake'] %}active{% endif %}"
+        >
+          <i class="fa-solid fa-circle-question"></i> Take Quiz
+        </a>
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-outline"
           >Log out</a
         >

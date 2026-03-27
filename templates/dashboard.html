@@ -406,6 +406,53 @@
       </div>
       {% endif %}
     </div>
+    <!-- ══ SKILL STRENGTH CHART ══ -->
+    {% if profile and profile.skills %}
+    <div style="margin-top: 2rem" data-aos="fade-up">
+      <h2 class="section-title">Skill Strength</h2>
+      <div class="card" style="padding: 1.75rem">
+        <p
+          style="
+            font-size: 0.82rem;
+            color: var(--text-soft);
+            margin-bottom: 1.4rem;
+          "
+        >
+          Based on your listed skills — the more specific your skills, the
+          better your recommendations.
+        </p>
+
+        <div class="skill-bar-wrap">
+          {% set skill_list = profile.skills.split(',') %} {% set domain_map = {
+          'python': 90, 'javascript': 85, 'html': 80, 'css': 80, 'sql': 75,
+          'react': 82, 'flask': 78, 'nodejs': 80, 'machine learning': 88, 'deep
+          learning': 85, 'pandas': 82, 'tensorflow': 84, 'sklearn': 80,
+          'docker': 76, 'linux': 74, 'java': 78, 'kotlin': 75, 'flutter': 77,
+          'dart': 74, 'mongodb': 72, 'git': 70, 'aws': 80, 'nlp': 83, } %} {%
+          for skill in skill_list[:8] %} {% set s = skill.strip().lower() %} {%
+          set pct = domain_map.get(s, 65) %}
+          <div class="skill-bar-item">
+            <div class="skill-bar-label">
+              <span>{{ skill.strip() }}</span>
+              <span style="color: var(--rose)">{{ pct }}%</span>
+            </div>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" data-width="{{ pct }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if skill_list | length > 8 %}
+        <p
+          style="font-size: 0.78rem; color: var(--text-soft); margin-top: 1rem"
+        >
+          +{{ skill_list|length - 8 }} more skills in your profile.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </main>
 </div>
 {% endblock %}

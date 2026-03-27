@@ -207,3 +207,34 @@ document.querySelectorAll("form[data-confirm]").forEach((form) => {
     if (!confirm(form.dataset.confirm)) e.preventDefault();
   });
 });
+/* ──────────────────────────────────────
+   9. SORT CARDS
+────────────────────────────────────── */
+const sortSelect = document.getElementById("sortSelect");
+if (sortSelect) {
+  sortSelect.addEventListener("change", () => {
+    const by = sortSelect.value;
+    const wrap = document.querySelector(".main-content");
+    const cards = [...document.querySelectorAll(".project-card")];
+
+    cards.sort((a, b) => {
+      if (by === "match")
+        return parseInt(b.dataset.match) - parseInt(a.dataset.match);
+      if (by === "days")
+        return parseInt(a.dataset.days) - parseInt(b.dataset.days);
+      if (by === "difficulty") {
+        const order = { beginner: 1, intermediate: 2, advanced: 3 };
+        const da = (a.querySelector(".badge")?.textContent || "")
+          .toLowerCase()
+          .trim();
+        const db = (b.querySelector(".badge")?.textContent || "")
+          .toLowerCase()
+          .trim();
+        return (order[da] || 2) - (order[db] || 2);
+      }
+      return 0;
+    });
+
+    cards.forEach((c) => wrap.appendChild(c));
+  });
+}

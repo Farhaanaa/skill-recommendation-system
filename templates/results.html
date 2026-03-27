@@ -40,7 +40,7 @@ endblock %} {% block body %}
       class="card"
       style="
         padding: 1.25rem 1.5rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.25rem;
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
@@ -96,6 +96,51 @@ endblock %} {% block body %}
       </span>
     </div>
 
+    <!-- ══ FILTER + SORT BAR ══ -->
+    {% if recommendations %}
+    <div class="filter-bar" data-aos="fade-up">
+      <span
+        style="
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: var(--text-soft);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        "
+        >Filter:</span
+      >
+      <button class="filter-chip active" data-filter="all">All</button>
+      {% set seen = [] %} {% for rec in recommendations %} {% if rec.domain not
+      in seen %} {% set _ = seen.append(rec.domain) %}
+      <button class="filter-chip" data-filter="{{ rec.domain | lower }}">
+        {{ rec.domain }}
+      </button>
+      {% endif %} {% endfor %}
+
+      <div
+        style="
+          margin-left: auto;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        "
+      >
+        <span style="font-size: 0.78rem; color: var(--text-soft)"
+          >Sort by:</span
+        >
+        <select
+          id="sortSelect"
+          class="form-control"
+          style="padding: 0.3rem 0.7rem; font-size: 0.78rem; width: auto"
+        >
+          <option value="match">Match %</option>
+          <option value="difficulty">Difficulty</option>
+          <option value="days">Shortest first</option>
+        </select>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- No results -->
     {% if not recommendations %}
     <div style="text-align: center; padding: 5rem 1rem" data-aos="fade-up">
@@ -118,12 +163,15 @@ endblock %} {% block body %}
     <!-- ══ PROJECT CARDS ══ -->
     {% for rec in recommendations %}
     <div
-      class="card"
+      class="card project-card"
+      data-domain="{{ rec.domain | lower }}"
+      data-match="{{ rec.match_pct }}"
+      data-days="{{ rec.estimated_days }}"
       style="padding: 0; margin-bottom: 1.75rem; overflow: hidden"
       data-aos="fade-up"
       data-aos-delay="{{ loop.index0 * 80 }}"
     >
-      <!-- Card top bar (rank + match %) -->
+      <!-- Card top bar -->
       <div
         style="
           background: linear-gradient(
@@ -138,43 +186,44 @@ endblock %} {% block body %}
           border-bottom: 1px solid rgba(232, 160, 160, 0.18);
         "
       >
-        <span
-          style="
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--rose);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-          "
-        >
-          <i class="fa-solid fa-trophy" style="font-size: 0.7rem"></i>
-          Match #{{ loop.index }}
-        </span>
-
-        <!-- Match % bar -->
-        <div style="display: flex; align-items: center; gap: 0.75rem">
-          <div class="progress-wrap" style="width: 120px">
-            <div
-              class="progress-bar"
-              data-width="{{ rec.match_pct }}"
-              style="
-                background: linear-gradient(
-                  90deg,
-                  var(--pink-deep),
-                  var(--rose)
-                );
-              "
-            ></div>
-          </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem">
+          <!-- Domain dot -->
+          <span
+            class="domain-dot"
+            data-domain="{{ rec.domain | lower }}"
+          ></span>
           <span
             style="
-              font-size: 0.82rem;
-              font-weight: 700;
+              font-size: 0.78rem;
+              font-weight: 600;
               color: var(--rose);
-              min-width: 36px;
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
             "
-            >{{ rec.match_pct }}%</span
           >
+            <i class="fa-solid fa-trophy" style="font-size: 0.7rem"></i>
+            Match #{{ loop.index }} &nbsp;·&nbsp; {{ rec.domain }}
+          </span>
+        </div>
+
+        <!-- Score ring + match bar -->
+        <div style="display: flex; align-items: center; gap: 1rem">
+          <div class="score-ring" data-score="{{ rec.match_pct }}"></div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 0.25rem;
+              min-width: 100px;
+            "
+          >
+            <span style="font-size: 0.7rem; color: var(--text-soft)"
+              >Skill match</span
+            >
+            <div class="progress-wrap" style="width: 100px">
+              <div class="progress-bar" data-width="{{ rec.match_pct }}"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -202,11 +251,6 @@ endblock %} {% block body %}
                 flex-wrap: wrap;
               "
             >
-              <!-- Domain -->
-              <span style="font-size: 0.78rem; color: var(--text-soft)">
-                <i class="fa-solid fa-folder" style="font-size: 0.7rem"></i> {{
-                rec.domain }}
-              </span>
               <!-- Difficulty badge -->
               {% if rec.difficulty == 'Beginner' %}
               <span class="badge badge-beginner">{{ rec.difficulty }}</span>
@@ -214,15 +258,13 @@ endblock %} {% block body %}
               <span class="badge badge-intermediate">{{ rec.difficulty }}</span>
               {% else %}
               <span class="badge badge-advanced">{{ rec.difficulty }}</span>
-              {% endif %}
-              <!-- Time -->
-              {% if rec.estimated_days %}
+              {% endif %} {% if rec.estimated_days %}
               <span style="font-size: 0.78rem; color: var(--text-soft)">
                 <i class="fa-regular fa-clock" style="font-size: 0.7rem"></i>
                 ~{{ rec.estimated_days }} days
               </span>
               {% endif %}
-              <!-- User level -->
+
               <span style="font-size: 0.78rem; color: var(--text-soft)">
                 <i class="fa-solid fa-signal" style="font-size: 0.7rem"></i>
                 Your level:
@@ -230,10 +272,18 @@ endblock %} {% block body %}
                   >{{ rec.user_level }}</strong
                 >
               </span>
+
+              <span style="font-size: 0.78rem; color: var(--text-soft)">
+                <i class="fa-solid fa-chart-line" style="font-size: 0.7rem"></i>
+                Similarity:
+                <strong style="color: var(--text-mid)"
+                  >{{ (rec.similarity_score * 100) | round(1) }}%</strong
+                >
+              </span>
             </div>
           </div>
 
-          <!-- Bookmark & Feedback buttons -->
+          <!-- Action buttons -->
           <div
             style="display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap"
           >
@@ -309,26 +359,9 @@ endblock %} {% block body %}
           {{ rec.description }}
         </p>
 
-        <!-- ✦ Why recommended (explanation) -->
-        <div
-          style="
-            background: var(--cream);
-            border-left: 3px solid var(--pink-deep);
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            padding: 0.9rem 1.1rem;
-            margin-bottom: 1.4rem;
-          "
-        >
-          <div
-            style="
-              font-size: 0.75rem;
-              font-weight: 700;
-              text-transform: uppercase;
-              letter-spacing: 0.08em;
-              color: var(--pink-deep);
-              margin-bottom: 0.35rem;
-            "
-          >
+        <!-- Why recommended -->
+        <div class="explanation-block" style="margin-bottom: 1.4rem">
+          <div class="explanation-label">
             <i class="fa-solid fa-lightbulb"></i> Why this project?
           </div>
           <p
@@ -343,9 +376,8 @@ endblock %} {% block body %}
           </p>
         </div>
 
-        <!-- Skills grid: matched + missing -->
+        <!-- Skills grid -->
         <div class="grid-2" style="margin-bottom: 1.4rem">
-          <!-- Matched skills -->
           <div>
             <div
               style="
@@ -361,11 +393,7 @@ endblock %} {% block body %}
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.4rem">
               {% if rec.matched_skills %} {% for skill in rec.matched_skills %}
-              <span
-                class="badge badge-skill"
-                style="background: #e8f5e9; color: #2e7d32"
-                >{{ skill }}</span
-              >
+              <span class="chip chip-matched">{{ skill }}</span>
               {% endfor %} {% else %}
               <span style="font-size: 0.82rem; color: var(--text-soft)"
                 >None matched yet</span
@@ -374,7 +402,6 @@ endblock %} {% block body %}
             </div>
           </div>
 
-          <!-- Missing skills -->
           <div>
             <div
               style="
@@ -390,7 +417,7 @@ endblock %} {% block body %}
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.4rem">
               {% if rec.missing_skills %} {% for skill in rec.missing_skills %}
-              <span class="badge badge-missing">{{ skill }}</span>
+              <span class="chip chip-missing">{{ skill }}</span>
               {% endfor %} {% else %}
               <span
                 style="font-size: 0.82rem; color: #2e7d32; font-weight: 600"
@@ -402,7 +429,7 @@ endblock %} {% block body %}
           </div>
         </div>
 
-        <!-- Tools & Tags row -->
+        <!-- Tools & Career -->
         <div style="margin-bottom: 1.4rem">
           {% if rec.tools %}
           <div style="margin-bottom: 0.6rem">
@@ -418,7 +445,7 @@ endblock %} {% block body %}
               <i class="fa-solid fa-screwdriver-wrench"></i> Tools:
             </span>
             {% for tool in rec.tools.split(',') %}
-            <span class="badge badge-skill" style="margin-left: 0.25rem"
+            <span class="chip chip-neutral" style="margin-left: 0.25rem"
               >{{ tool.strip() }}</span
             >
             {% endfor %}
@@ -448,7 +475,7 @@ endblock %} {% block body %}
           {% endif %}
         </div>
 
-        <!-- Learning resource link -->
+        <!-- Learning resource -->
         {% if rec.resources %}
         <div
           style="
@@ -459,6 +486,7 @@ endblock %} {% block body %}
             gap: 0.75rem;
             padding-top: 1rem;
             border-top: 1px solid rgba(232, 160, 160, 0.15);
+            margin-bottom: 0;
           "
         >
           <span style="font-size: 0.82rem; color: var(--text-soft)">
@@ -476,14 +504,93 @@ endblock %} {% block body %}
               ></i>
             </a>
           </span>
-          <span style="font-size: 0.78rem; color: var(--text-soft)">
-            Similarity score:
-            <strong style="color: var(--text-mid)"
-              >{{ (rec.similarity_score * 100) | round(1) }}%</strong
-            >
-          </span>
         </div>
         {% endif %}
+
+        <!-- ══ ROADMAP ══ -->
+        <div
+          style="
+            padding-top: 1.25rem;
+            margin-top: 1.25rem;
+            border-top: 1px solid rgba(232, 160, 160, 0.15);
+          "
+        >
+          <div
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.08em;
+              color: var(--text-soft);
+              margin-bottom: 1rem;
+            "
+          >
+            <i class="fa-solid fa-map"></i> Project Roadmap
+          </div>
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-dot">1</div>
+              <div class="roadmap-content">
+                <h4>Learn the missing skills</h4>
+                <p>
+                  {% if rec.missing_skills %} Focus on:
+                  <strong>{{ rec.missing_skills[:3] | join(', ') }}</strong>.
+                  Use the resource link above to get started. {% else %} You
+                  already have all required skills — move straight to planning!
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <div class="roadmap-step">
+              <div class="roadmap-dot">2</div>
+              <div class="roadmap-content">
+                <h4>Set up your environment</h4>
+                <p>
+                  Install tools:
+                  <strong
+                    >{{ rec.tools if rec.tools else 'VS Code, Git' }}</strong
+                  >. Create a GitHub repo and initialise your project folder
+                  structure.
+                </p>
+              </div>
+            </div>
+
+            <div class="roadmap-step">
+              <div class="roadmap-dot">3</div>
+              <div class="roadmap-content">
+                <h4>Build the core features</h4>
+                <p>
+                  {{ rec.description }} Start small — get one working feature
+                  before expanding scope.
+                </p>
+              </div>
+            </div>
+
+            <div class="roadmap-step">
+              <div class="roadmap-dot">4</div>
+              <div class="roadmap-content">
+                <h4>Test, refine and deploy</h4>
+                <p>
+                  Write basic tests, fix bugs, then deploy publicly. Estimated
+                  completion: <strong>~{{ rec.estimated_days }} days</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div class="roadmap-step">
+              <div class="roadmap-dot">5</div>
+              <div class="roadmap-content">
+                <h4>Add to your portfolio</h4>
+                <p>
+                  Write a clear README, record a short demo, push to GitHub and
+                  share on LinkedIn to attract recruiters.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /roadmap -->
       </div>
       <!-- /card body -->
     </div>
@@ -512,4 +619,37 @@ endblock %} {% block body %}
     {% endif %}
   </main>
 </div>
-{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  /* Sort cards */
+  const sortSelect = document.getElementById("sortSelect");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", () => {
+      const by = sortSelect.value;
+      const wrap = document.querySelector(".main-content");
+      const cards = [...document.querySelectorAll(".project-card")];
+
+      cards.sort((a, b) => {
+        if (by === "match")
+          return parseInt(b.dataset.match) - parseInt(a.dataset.match);
+        if (by === "days")
+          return parseInt(a.dataset.days) - parseInt(b.dataset.days);
+        if (by === "difficulty") {
+          const order = { beginner: 1, intermediate: 2, advanced: 3 };
+          const da = (a.querySelector(".badge")?.textContent || "")
+            .toLowerCase()
+            .trim();
+          const db = (b.querySelector(".badge")?.textContent || "")
+            .toLowerCase()
+            .trim();
+          return (order[da] || 2) - (order[db] || 2);
+        }
+        return 0;
+      });
+
+      cards.forEach((c) => wrap.appendChild(c));
+    });
+  }
+</script>
+{% endblock %} {% endblock %}
