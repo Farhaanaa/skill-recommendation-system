@@ -1,0 +1,435 @@
+/* ══════════════════════════════════════
+   SKILL BARS — animated on scroll
+══════════════════════════════════════ */
+.skill-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skill-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.skill-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.skill-bar-track {
+  background: var(--cream-dark);
+  border-radius: 20px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 20px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--pink-deep), var(--rose));
+  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════
+   PROJECT CARD — hover lift
+══════════════════════════════════════ */
+.project-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(232, 160, 160, 0.12);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.project-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: rgba(201, 112, 112, 0.25);
+}
+
+/* ══════════════════════════════════════
+   MATCH SCORE RING
+══════════════════════════════════════ */
+.score-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.score-ring svg {
+  transform: rotate(-90deg);
+}
+
+.score-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rose);
+}
+
+/* ══════════════════════════════════════
+   TAG CHIPS
+══════════════════════════════════════ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+
+.chip-matched {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.chip-missing {
+  background: #fce4ec;
+  color: #b71c1c;
+  border-color: #f8bbd0;
+}
+
+.chip-neutral {
+  background: var(--cream-dark);
+  color: var(--text-mid);
+  border-color: rgba(232, 160, 160, 0.2);
+}
+
+/* ══════════════════════════════════════
+   DOMAIN COLOR DOTS
+══════════════════════════════════════ */
+.domain-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.domain-aiml {
+  background: #7c3aed;
+}
+.domain-webdev {
+  background: #0ea5e9;
+}
+.domain-backend {
+  background: #10b981;
+}
+.domain-cybersecurity {
+  background: #ef4444;
+}
+.domain-datascience {
+  background: #f59e0b;
+}
+.domain-mobile {
+  background: #ec4899;
+}
+.domain-devops {
+  background: #64748b;
+}
+.domain-iot {
+  background: #14b8a6;
+}
+.domain-blockchain {
+  background: #8b5cf6;
+}
+.domain-general {
+  background: #a78bfa;
+}
+.domain-productivity {
+  background: #fb923c;
+}
+
+/* ══════════════════════════════════════
+   EXPLANATION BLOCK
+══════════════════════════════════════ */
+.explanation-block {
+  background: var(--cream);
+  border-left: 3px solid var(--pink-deep);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.9rem 1.1rem;
+}
+
+.explanation-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pink-deep);
+  margin-bottom: 0.3rem;
+}
+
+/* ══════════════════════════════════════
+   ROADMAP STEPPER
+══════════════════════════════════════ */
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 0.5rem;
+}
+
+.roadmap-step {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.roadmap-step::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 28px;
+  width: 2px;
+  height: calc(100% - 12px);
+  background: rgba(232, 160, 160, 0.3);
+}
+
+.roadmap-step:last-child::before {
+  display: none;
+}
+
+.roadmap-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--pink-light);
+  border: 2px solid var(--pink-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--rose);
+  flex-shrink: 0;
+  margin-top: 4px;
+  z-index: 1;
+}
+
+.roadmap-content {
+  padding-bottom: 1.4rem;
+  flex: 1;
+}
+
+.roadmap-content h4 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.2rem;
+}
+
+.roadmap-content p {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+}
+
+.empty-state i {
+  font-size: 2.8rem;
+  color: var(--pink);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+}
+
+.empty-state p {
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ══════════════════════════════════════
+   STAT CARD
+══════════════════════════════════════ */
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(232, 160, 160, 0.12);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--pink-light);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon i {
+  color: var(--rose);
+  font-size: 1.1rem;
+}
+
+.stat-value {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--rose);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.2rem;
+}
+
+/* ══════════════════════════════════════
+   TOOLTIP
+══════════════════════════════════════ */
+[data-tip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-dark);
+  color: var(--white);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 999;
+}
+
+[data-tip]:hover::after {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════
+   SEARCH / FILTER BAR
+══════════════════════════════════════ */
+.filter-bar {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filter-chip {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1.5px solid rgba(232, 160, 160, 0.3);
+  background: var(--white);
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-chip:hover,
+.filter-chip.active {
+  background: var(--pink-light);
+  border-color: var(--pink-deep);
+  color: var(--rose);
+}
+
+/* ══════════════════════════════════════
+   SCROLL TO TOP BUTTON
+══════════════════════════════════════ */
+#scrollTop {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 40px;
+  height: 40px;
+  background: var(--rose);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(139, 58, 58, 0.28);
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+  z-index: 800;
+  font-size: 0.85rem;
+}
+
+#scrollTop.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#scrollTop:hover {
+  background: var(--pink-deep);
+  transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE TWEAKS
+══════════════════════════════════════ */
+@media (max-width: 600px) {
+  .filter-bar {
+    gap: 0.4rem;
+  }
+  .score-ring {
+    width: 52px;
+    height: 52px;
+  }
+  .score-ring-text {
+    font-size: 0.82rem;
+  }
+}
