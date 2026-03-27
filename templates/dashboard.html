@@ -1,0 +1,411 @@
+{% extends "base.html" %} {% block title %}Dashboard — SkillMatch{% endblock %}
+{% block body %}
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Menu</div>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link active">
+      <i class="fa-solid fa-gauge"></i> Dashboard
+    </a>
+    <a href="{{ url_for('profile') }}" class="sidebar-link">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Account</div>
+    <a href="{{ url_for('logout') }}" class="sidebar-link">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <!-- Welcome header -->
+    <div
+      class="page-header"
+      data-aos="fade-up"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      "
+    >
+      <div>
+        <h1>Welcome back, {{ current_user.username }} 👋</h1>
+        <p>Here's your SkillMatch overview.</p>
+      </div>
+      <a href="{{ url_for('profile') }}" class="btn btn-primary">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+      </a>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid-3" style="margin-bottom: 2rem" data-aos="fade-up">
+      <div
+        class="card"
+        style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem"
+      >
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            background: var(--pink-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
+        >
+          <i
+            class="fa-solid fa-bookmark"
+            style="color: var(--rose); font-size: 1.1rem"
+          ></i>
+        </div>
+        <div>
+          <div
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 2rem;
+              font-weight: 600;
+              color: var(--rose);
+              line-height: 1;
+            "
+          >
+            {{ bookmark_count }}
+          </div>
+          <div
+            style="
+              font-size: 0.8rem;
+              color: var(--text-soft);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Saved Projects
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="card"
+        style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem"
+      >
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            background: var(--pink-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
+        >
+          <i
+            class="fa-solid fa-user-circle"
+            style="color: var(--rose); font-size: 1.1rem"
+          ></i>
+        </div>
+        <div>
+          <div
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 2rem;
+              font-weight: 600;
+              color: var(--rose);
+              line-height: 1;
+            "
+          >
+            {{ '✓' if profile_complete else '—' }}
+          </div>
+          <div
+            style="
+              font-size: 0.8rem;
+              color: var(--text-soft);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Profile Status
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="card"
+        style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem"
+      >
+        <div
+          style="
+            width: 48px;
+            height: 48px;
+            background: var(--pink-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          "
+        >
+          <i
+            class="fa-solid fa-database"
+            style="color: var(--rose); font-size: 1.1rem"
+          ></i>
+        </div>
+        <div>
+          <div
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 2rem;
+              font-weight: 600;
+              color: var(--rose);
+              line-height: 1;
+            "
+          >
+            60+
+          </div>
+          <div
+            style="
+              font-size: 0.8rem;
+              color: var(--text-soft);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Projects Available
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile snapshot -->
+    {% if profile %}
+    <div
+      class="card"
+      style="padding: 1.75rem; margin-bottom: 2rem"
+      data-aos="fade-up"
+    >
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.2rem;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        "
+      >
+        <h2 style="font-size: 1.4rem">Your Profile</h2>
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-pen"></i> Update
+        </a>
+      </div>
+
+      <div class="grid-2" style="gap: 0.9rem">
+        {% set fields = [ ('fa-lightbulb', 'Interests', profile.interests),
+        ('fa-graduation-cap', 'Qualification', profile.qualification),
+        ('fa-book', 'Course', profile.course), ('fa-briefcase', 'Career',
+        profile.career), ('fa-bullseye', 'Goal', profile.career_goal),
+        ('fa-certificate', 'Certifications',profile.certifications), ] %} {% for
+        icon, label, value in fields %} {% if value %}
+        <div style="display: flex; gap: 0.6rem; align-items: flex-start">
+          <i
+            class="fa-solid {{ icon }}"
+            style="
+              color: var(--pink-deep);
+              font-size: 0.85rem;
+              margin-top: 3px;
+              width: 14px;
+              text-align: center;
+              flex-shrink: 0;
+            "
+          ></i>
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                letter-spacing: 0.07em;
+                color: var(--text-soft);
+                font-weight: 600;
+              "
+            >
+              {{ label }}
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-mid)">
+              {{ value }}
+            </div>
+          </div>
+        </div>
+        {% endif %} {% endfor %}
+      </div>
+
+      {% if profile.skills %}
+      <div
+        style="
+          margin-top: 1.2rem;
+          padding-top: 1.2rem;
+          border-top: 1px solid rgba(232, 160, 160, 0.15);
+        "
+      >
+        <div
+          style="
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-soft);
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+          "
+        >
+          <i class="fa-solid fa-code"></i> Skills
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem">
+          {% for skill in profile.skills.split(',') %}
+          <span class="badge badge-skill">{{ skill.strip() }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <!-- No profile yet -->
+    <div
+      class="card"
+      style="padding: 2.5rem; text-align: center; margin-bottom: 2rem"
+      data-aos="fade-up"
+    >
+      <i
+        class="fa-solid fa-user-pen"
+        style="font-size: 2.5rem; color: var(--pink); margin-bottom: 1rem"
+      ></i>
+      <h2 style="font-size: 1.4rem; margin-bottom: 0.5rem">
+        Complete your profile
+      </h2>
+      <p
+        style="
+          color: var(--text-soft);
+          font-size: 0.88rem;
+          margin-bottom: 1.5rem;
+        "
+      >
+        Fill in your skills and interests to get personalised project
+        recommendations.
+      </p>
+      <a href="{{ url_for('profile') }}" class="btn btn-primary">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Set Up Profile
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- Bookmarks -->
+    <div data-aos="fade-up">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1.2rem;
+        "
+      >
+        <h2 class="section-title" style="margin: 0">Saved Projects</h2>
+        <span style="font-size: 0.82rem; color: var(--text-soft)"
+          >{{ bookmark_count }} saved</span
+        >
+      </div>
+
+      {% if bookmarks %}
+      <div style="display: flex; flex-direction: column; gap: 0.75rem">
+        {% for bm in bookmarks %}
+        <div
+          class="card"
+          style="
+            padding: 1.1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 0.85rem">
+            <i
+              class="fa-solid fa-bookmark"
+              style="color: var(--pink-deep); font-size: 0.95rem"
+            ></i>
+            <div>
+              <div
+                style="
+                  font-weight: 600;
+                  font-size: 0.92rem;
+                  color: var(--text-dark);
+                "
+              >
+                {{ bm.project_title }}
+              </div>
+              {% if bm.project_domain %}
+              <div style="font-size: 0.78rem; color: var(--text-soft)">
+                {{ bm.project_domain }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+              flex-shrink: 0;
+            "
+          >
+            <span style="font-size: 0.75rem; color: var(--text-soft)">
+              <i class="fa-regular fa-clock" style="font-size: 0.7rem"></i>
+              {{ bm.saved_at.strftime('%d %b %Y') }}
+            </span>
+            <form
+              method="POST"
+              action="{{ url_for('remove_bookmark', bookmark_id=bm.id) }}"
+              style="display: inline"
+            >
+              <button
+                type="submit"
+                class="btn btn-ghost btn-sm"
+                onclick="return confirm('Remove this bookmark?');"
+                title="Remove bookmark"
+              >
+                <i
+                  class="fa-solid fa-trash"
+                  style="font-size: 0.75rem; color: var(--pink-deep)"
+                ></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card" style="padding: 2rem; text-align: center">
+        <i
+          class="fa-regular fa-bookmark"
+          style="font-size: 2rem; color: var(--pink); margin-bottom: 0.8rem"
+        ></i>
+        <p style="color: var(--text-soft); font-size: 0.88rem">
+          No saved projects yet. Get recommendations and bookmark the ones you
+          like!
+        </p>
+        <a
+          href="{{ url_for('profile') }}"
+          class="btn btn-secondary"
+          style="margin-top: 1rem"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}

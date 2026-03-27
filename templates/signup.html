@@ -1,0 +1,221 @@
+{% extends "base.html" %} {% block title %}Sign Up — SkillMatch{% endblock %} {%
+block body %}
+<main
+  style="
+    padding-top: var(--nav-h);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 3rem;
+  "
+>
+  <!-- bg blob -->
+  <div style="position: fixed; inset: 0; pointer-events: none; z-index: 0">
+    <div
+      style="
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(232, 160, 160, 0.15) 0%,
+          transparent 70%
+        );
+        top: -100px;
+        right: -100px;
+        border-radius: 50%;
+      "
+    ></div>
+    <div
+      style="
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(201, 112, 112, 0.08) 0%,
+          transparent 70%
+        );
+        bottom: 0;
+        left: -80px;
+        border-radius: 50%;
+      "
+    ></div>
+  </div>
+
+  <div
+    style="
+      width: 100%;
+      max-width: 460px;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 1;
+    "
+    data-aos="fade-up"
+  >
+    <!-- Logo -->
+    <div style="text-align: center; margin-bottom: 2rem">
+      <a
+        href="{{ url_for('index') }}"
+        style="
+          font-family: &quot;Cormorant Garamond&quot;, serif;
+          font-size: 1.8rem;
+          font-weight: 600;
+          color: var(--rose);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+        "
+      >
+        <span
+          style="
+            width: 8px;
+            height: 8px;
+            background: var(--pink-deep);
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 2px;
+          "
+        ></span>
+        SkillMatch
+      </a>
+      <p
+        style="color: var(--text-soft); font-size: 0.88rem; margin-top: 0.4rem"
+      >
+        Create your free account
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="card" style="padding: 2.25rem 2rem">
+      <h2 style="font-size: 1.7rem; margin-bottom: 0.3rem">Get started</h2>
+      <p
+        style="
+          color: var(--text-soft);
+          font-size: 0.85rem;
+          margin-bottom: 1.75rem;
+        "
+      >
+        Find projects that match your exact skills.
+      </p>
+
+      <form
+        method="POST"
+        action="{{ url_for('signup') }}"
+        style="display: flex; flex-direction: column; gap: 1.1rem"
+      >
+        <div class="form-group">
+          <label class="form-label" for="username">
+            <i class="fa-solid fa-user" style="font-size: 0.7rem"></i> Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="form-control"
+            placeholder="e.g. priya_dev"
+            required
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">
+            <i class="fa-solid fa-envelope" style="font-size: 0.7rem"></i> Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">
+            <i class="fa-solid fa-lock" style="font-size: 0.7rem"></i> Password
+          </label>
+          <div style="position: relative">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="Min. 6 characters"
+              required
+              autocomplete="new-password"
+              style="padding-right: 2.8rem"
+            />
+            <button
+              type="button"
+              onclick="togglePwd()"
+              style="
+                position: absolute;
+                right: 0.8rem;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: var(--text-soft);
+                font-size: 0.9rem;
+              "
+              tabindex="-1"
+            >
+              <i class="fa-regular fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full"
+          style="
+            margin-top: 0.4rem;
+            padding: 0.85rem;
+            font-size: 0.95rem;
+            border-radius: var(--radius-sm);
+          "
+        >
+          <i class="fa-solid fa-rocket"></i> Create Account
+        </button>
+      </form>
+
+      <p
+        style="
+          text-align: center;
+          margin-top: 1.4rem;
+          font-size: 0.85rem;
+          color: var(--text-soft);
+        "
+      >
+        Already have an account?
+        <a
+          href="{{ url_for('login') }}"
+          style="color: var(--rose); font-weight: 600"
+          >Log in</a
+        >
+      </p>
+    </div>
+  </div>
+</main>
+
+{% block extra_scripts %}
+<script>
+  function togglePwd() {
+    const inp = document.getElementById("password");
+    const ico = document.getElementById("eyeIcon");
+    if (inp.type === "password") {
+      inp.type = "text";
+      ico.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+      inp.type = "password";
+      ico.classList.replace("fa-eye-slash", "fa-eye");
+    }
+  }
+</script>
+{% endblock %} {% endblock %}

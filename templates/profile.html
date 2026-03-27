@@ -1,0 +1,244 @@
+{% extends "base.html" %} {% block title %}Your Profile — SkillMatch{% endblock
+%} {% block body %}
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Menu</div>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+      <i class="fa-solid fa-gauge"></i> Dashboard
+    </a>
+    <a href="{{ url_for('profile') }}" class="sidebar-link active">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Account</div>
+    <a href="{{ url_for('logout') }}" class="sidebar-link">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="page-header" data-aos="fade-up">
+      <h1>Tell us about yourself</h1>
+      <p>The more detail you give, the better your recommendations will be.</p>
+    </div>
+
+    <div
+      class="card"
+      style="padding: 2.25rem 2rem; max-width: 780px"
+      data-aos="fade-up"
+    >
+      <form
+        method="POST"
+        action="{{ url_for('profile') }}"
+        style="display: flex; flex-direction: column; gap: 1.4rem"
+        onsubmit="showSpinner()"
+      >
+        <!-- Row 1 -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-lightbulb" style="font-size: 0.7rem"></i>
+              Interests
+            </label>
+            <input
+              type="text"
+              name="interests"
+              class="form-control"
+              placeholder="e.g. AI, Web Dev, Cybersecurity"
+              value="{{ existing.interests if existing else '' }}"
+            />
+            <span style="font-size: 0.75rem; color: var(--text-soft)"
+              >Separate with commas</span
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i
+                class="fa-solid fa-graduation-cap"
+                style="font-size: 0.7rem"
+              ></i>
+              Qualification
+            </label>
+            <input
+              type="text"
+              name="qualification"
+              class="form-control"
+              placeholder="e.g. B.Tech, BCA, BSc"
+              value="{{ existing.qualification if existing else '' }}"
+            />
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-book" style="font-size: 0.7rem"></i> Course
+              Studied
+            </label>
+            <input
+              type="text"
+              name="course"
+              class="form-control"
+              placeholder="e.g. Computer Science, ECE"
+              value="{{ existing.course if existing else '' }}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-briefcase" style="font-size: 0.7rem"></i>
+              Current Career
+            </label>
+            <input
+              type="text"
+              name="career"
+              class="form-control"
+              placeholder="e.g. Student, Junior Developer"
+              value="{{ existing.career if existing else '' }}"
+            />
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-bullseye" style="font-size: 0.7rem"></i>
+            Career Goal
+          </label>
+          <input
+            type="text"
+            name="career_goal"
+            class="form-control"
+            placeholder="e.g. Data Scientist, Full Stack Developer, ML Engineer"
+            value="{{ existing.career_goal if existing else '' }}"
+          />
+        </div>
+
+        <!-- Row 4 — skills (most important) -->
+        <div class="form-group">
+          <label class="form-label" style="color: var(--rose)">
+            <i class="fa-solid fa-code" style="font-size: 0.7rem"></i> Your
+            Skills
+            <span
+              style="
+                color: var(--pink-deep);
+                font-size: 0.7rem;
+                margin-left: 0.3rem;
+              "
+              >★ Most important</span
+            >
+          </label>
+          <input
+            type="text"
+            name="skills"
+            class="form-control"
+            placeholder="e.g. python, sql, html, css, machine learning"
+            value="{{ existing.skills if existing else '' }}"
+            style="border-color: rgba(201, 112, 112, 0.4)"
+          />
+          <span style="font-size: 0.75rem; color: var(--text-soft)"
+            >Comma-separated — be specific, e.g. "pandas" not just "data"</span
+          >
+        </div>
+
+        <!-- Row 5 -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-certificate" style="font-size: 0.7rem"></i>
+              Certifications
+            </label>
+            <input
+              type="text"
+              name="certifications"
+              class="form-control"
+              placeholder="e.g. AWS Cloud, Google Data Analytics"
+              value="{{ existing.certifications if existing else '' }}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <i
+                class="fa-solid fa-screwdriver-wrench"
+                style="font-size: 0.7rem"
+              ></i>
+              Tools Known
+            </label>
+            <input
+              type="text"
+              name="tools_known"
+              class="form-control"
+              placeholder="e.g. VS Code, Jupyter, Docker, Figma"
+              value="{{ existing.tools_known if existing else '' }}"
+            />
+          </div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-comment" style="font-size: 0.7rem"></i> What
+            do you know?
+          </label>
+          <textarea
+            name="what_they_know"
+            class="form-control"
+            rows="3"
+            placeholder="Describe your experience freely — e.g. 'I have built REST APIs with Flask, know basic SQL, and completed Andrew Ng's ML course on Coursera.'"
+          >
+{{ existing.what_they_know if existing else '' }}</textarea
+          >
+        </div>
+
+        <!-- Tip box -->
+        <div
+          style="
+            background: var(--cream);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(232, 160, 160, 0.2);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+          "
+        >
+          <i
+            class="fa-solid fa-circle-info"
+            style="color: var(--pink-deep); margin-top: 2px; font-size: 0.9rem"
+          ></i>
+          <p
+            style="
+              font-size: 0.82rem;
+              color: var(--text-mid);
+              margin: 0;
+              line-height: 1.6;
+            "
+          >
+            <strong>Tip:</strong> The ML engine compares your full profile
+            against 60+ real-world projects using TF-IDF cosine similarity. The
+            more skills and context you add, the sharper your results.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            border-radius: var(--radius-sm);
+            align-self: flex-start;
+          "
+        >
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Find My Projects
+        </button>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

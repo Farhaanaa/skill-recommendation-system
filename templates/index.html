@@ -1,0 +1,441 @@
+{% extends "base.html" %} {% block title %}SkillMatch — Find Your Perfect
+Project{% endblock %} {% block body %}
+<main style="padding-top: var(--nav-h)">
+  <!-- ══ HERO SECTION ══ -->
+  <section
+    style="
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    "
+  >
+    <!-- Decorative bg blobs -->
+    <div style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+      <div
+        style="
+          position: absolute;
+          width: 650px;
+          height: 650px;
+          background: radial-gradient(
+            circle,
+            rgba(232, 160, 160, 0.18) 0%,
+            transparent 70%
+          );
+          top: -120px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-radius: 50%;
+        "
+      ></div>
+      <div
+        style="
+          position: absolute;
+          width: 280px;
+          height: 280px;
+          background: radial-gradient(
+            circle,
+            rgba(201, 112, 112, 0.09) 0%,
+            transparent 70%
+          );
+          bottom: 60px;
+          right: 6%;
+          border-radius: 50%;
+        "
+      ></div>
+      <div
+        style="
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          background: radial-gradient(
+            circle,
+            rgba(232, 160, 160, 0.1) 0%,
+            transparent 70%
+          );
+          top: 30%;
+          left: 4%;
+          border-radius: 50%;
+        "
+      ></div>
+    </div>
+
+    <div
+      style="max-width: 740px; position: relative; z-index: 1"
+      data-aos="fade-up"
+    >
+      <!-- Pill badge -->
+      <span
+        style="
+          display: inline-block;
+          background: var(--pink-light);
+          color: var(--rose);
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 0.4rem 1.2rem;
+          border-radius: 999px;
+          margin-bottom: 2rem;
+          border: 1px solid rgba(201, 112, 112, 0.22);
+        "
+      >
+        ✦ AI-Powered Project Recommendations
+      </span>
+
+      <h1
+        style="
+          font-size: clamp(2.8rem, 6vw, 4.6rem);
+          line-height: 1.07;
+          letter-spacing: -0.02em;
+          margin-bottom: 1.5rem;
+        "
+      >
+        Find projects that<br />
+        <em style="color: var(--rose); font-style: italic"
+          >match your skills</em
+        >
+      </h1>
+
+      <p
+        style="
+          font-size: 1.1rem;
+          color: var(--text-mid);
+          max-width: 520px;
+          margin: 0 auto 2.8rem;
+          line-height: 1.8;
+        "
+      >
+        Tell us your interests, qualifications &amp; goals. Our ML engine
+        analyses your profile and recommends the best-fit projects — with
+        explanations, skill gap analysis, and a step-by-step roadmap.
+      </p>
+
+      <!-- CTA buttons -->
+      <div
+        style="
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        "
+      >
+        {% if current_user.is_authenticated %}
+        <a
+          href="{{ url_for('profile') }}"
+          class="btn btn-primary"
+          style="
+            padding: 0.9rem 2.2rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            box-shadow: 0 8px 24px rgba(139, 58, 58, 0.25);
+          "
+        >
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+        </a>
+        <a
+          href="{{ url_for('dashboard') }}"
+          class="btn btn-secondary"
+          style="padding: 0.9rem 2.2rem; border-radius: 999px; font-size: 1rem"
+        >
+          <i class="fa-solid fa-gauge"></i> My Dashboard
+        </a>
+        {% else %}
+        <a
+          href="{{ url_for('signup') }}"
+          class="btn btn-primary"
+          style="
+            padding: 0.9rem 2.2rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            box-shadow: 0 8px 24px rgba(139, 58, 58, 0.25);
+          "
+        >
+          <i class="fa-solid fa-rocket"></i> Get Started Free
+        </a>
+        <a
+          href="{{ url_for('login') }}"
+          class="btn btn-secondary"
+          style="padding: 0.9rem 2.2rem; border-radius: 999px; font-size: 1rem"
+        >
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Log In
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Trust note -->
+      <p style="margin-top: 2rem; font-size: 0.82rem; color: var(--text-soft)">
+        <i class="fa-solid fa-lock" style="font-size: 0.7rem"></i>
+        No API keys needed &nbsp;·&nbsp; Runs 100% locally &nbsp;·&nbsp; Free to
+        use
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ══ -->
+  <section style="padding: 5rem 1.5rem; background: var(--white)">
+    <div style="max-width: 1020px; margin: 0 auto">
+      <div style="text-align: center; margin-bottom: 3.5rem" data-aos="fade-up">
+        <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem">How it works</h2>
+        <p style="color: var(--text-soft); font-size: 0.92rem">
+          Three steps to your perfect project match
+        </p>
+      </div>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+          gap: 1.75rem;
+        "
+      >
+        {% set steps = [ ('01', 'fa-user-pen', 'Fill your profile', 'Enter your
+        skills, interests, qualifications, certifications, and career goals in
+        one simple form.'), ('02', 'fa-brain', 'ML engine analyses', 'TF-IDF
+        vectorisation + cosine similarity compares your profile against 40+
+        curated real-world projects.'), ('03', 'fa-map-location-dot', 'Get your
+        roadmap', 'Receive top matches with explanations, skill gap analysis,
+        learning resources and a project timeline.') ] %} {% for num, icon,
+        title, desc in steps %}
+        <div
+          class="card"
+          style="padding: 2rem 1.75rem; position: relative; overflow: hidden"
+          data-aos="fade-up"
+          data-aos-delay="{{ loop.index0 * 100 }}"
+        >
+          <span
+            style="
+              font-family: &quot;Cormorant Garamond&quot;, serif;
+              font-size: 5rem;
+              font-weight: 600;
+              color: rgba(232, 160, 160, 0.18);
+              position: absolute;
+              top: 0.5rem;
+              right: 1rem;
+              line-height: 1;
+              pointer-events: none;
+            "
+            >{{ num }}</span
+          >
+
+          <div
+            style="
+              width: 48px;
+              height: 48px;
+              background: var(--pink-light);
+              border-radius: 14px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-bottom: 1.2rem;
+            "
+          >
+            <i
+              class="fa-solid {{ icon }}"
+              style="color: var(--rose); font-size: 1.15rem"
+            ></i>
+          </div>
+
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.6rem">{{ title }}</h3>
+          <p
+            style="color: var(--text-mid); font-size: 0.88rem; line-height: 1.7"
+          >
+            {{ desc }}
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FEATURES GRID ══ -->
+  <section style="padding: 5rem 1.5rem">
+    <div style="max-width: 1020px; margin: 0 auto">
+      <div style="text-align: center; margin-bottom: 3.5rem" data-aos="fade-up">
+        <h2 style="font-size: 2.5rem; margin-bottom: 0.5rem">
+          Everything you need
+        </h2>
+        <p style="color: var(--text-soft); font-size: 0.92rem">
+          Built-in tools to help you learn and build
+        </p>
+      </div>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+          gap: 1.1rem;
+        "
+      >
+        {% set features = [ ('fa-magnifying-glass-chart', 'Skill Gap Detection',
+        'See exactly which skills you need to learn next'),
+        ('fa-graduation-cap', 'Learning Resources', 'Curated links matched to
+        your experience level'), ('fa-map', 'Project Roadmap', 'Step-by-step
+        plan with tools and milestones'), ('fa-bookmark', 'Save & Bookmark',
+        'Save favourite projects to revisit anytime'), ('fa-thumbs-up',
+        'Feedback Loop', 'Like or dislike to improve future suggestions'),
+        ('fa-chart-bar', 'Skill Visualiser', 'See your strengths and gaps at a
+        glance'), ] %} {% for icon, title, desc in features %}
+        <div
+          style="
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem 1.25rem;
+            border: 1px solid rgba(232, 160, 160, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            transition: var(--transition);
+            cursor: default;
+          "
+          data-aos="fade-up"
+          data-aos-delay="{{ loop.index0 * 50 }}"
+          onmouseover="
+            this.style.borderColor = 'var(--pink)';
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = 'var(--shadow-sm)';
+          "
+          onmouseout="
+            this.style.borderColor = 'rgba(232,160,160,0.18)';
+            this.style.transform = '';
+            this.style.boxShadow = '';
+          "
+        >
+          <i
+            class="fa-solid {{ icon }}"
+            style="color: var(--pink-deep); font-size: 1.25rem"
+          ></i>
+          <strong style="font-size: 0.9rem; color: var(--text-dark)"
+            >{{ title }}</strong
+          >
+          <span
+            style="font-size: 0.8rem; color: var(--text-soft); line-height: 1.5"
+            >{{ desc }}</span
+          >
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STATS STRIP ══ -->
+  <section
+    style="padding: 3rem 1.5rem; background: var(--white)"
+    data-aos="fade-up"
+  >
+    <div
+      style="
+        max-width: 820px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1.5rem;
+        text-align: center;
+      "
+    >
+      {% for val, label in [('40+', 'Curated Projects'), ('10', 'Domains
+      Covered'), ('ML', 'Powered Engine'), ('Free', 'Always')] %}
+      <div>
+        <div
+          style="
+            font-family: &quot;Cormorant Garamond&quot;, serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: var(--rose);
+            line-height: 1;
+          "
+        >
+          {{ val }}
+        </div>
+        <div
+          style="
+            font-size: 0.82rem;
+            color: var(--text-soft);
+            margin-top: 0.3rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          {{ label }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ══ CTA BANNER ══ -->
+  {% if not current_user.is_authenticated %}
+  <section style="padding: 5rem 1.5rem; text-align: center">
+    <div
+      style="
+        max-width: 620px;
+        margin: 0 auto;
+        background: linear-gradient(
+          135deg,
+          var(--pink-light) 0%,
+          rgba(253, 248, 244, 0.5) 100%
+        );
+        border-radius: var(--radius-lg);
+        padding: 3.5rem 2.5rem;
+        border: 1px solid rgba(232, 160, 160, 0.25);
+      "
+      data-aos="fade-up"
+    >
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.9rem">
+        Ready to find your project?
+      </h2>
+      <p
+        style="
+          color: var(--text-mid);
+          font-size: 0.95rem;
+          margin-bottom: 2rem;
+          line-height: 1.7;
+        "
+      >
+        Create a free account and get personalised project recommendations in
+        under 2 minutes.
+      </p>
+      <a
+        href="{{ url_for('signup') }}"
+        class="btn btn-primary"
+        style="
+          padding: 0.9rem 2.4rem;
+          border-radius: 999px;
+          font-size: 1rem;
+          box-shadow: 0 8px 24px rgba(139, 58, 58, 0.25);
+        "
+      >
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Start for Free
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ══ FOOTER ══ -->
+  <footer
+    style="
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid rgba(232, 160, 160, 0.15);
+      color: var(--text-soft);
+      font-size: 0.82rem;
+    "
+  >
+    <span
+      style="
+        font-family: &quot;Cormorant Garamond&quot;, serif;
+        color: var(--rose);
+        font-size: 1rem;
+        font-weight: 600;
+      "
+      >SkillMatch</span
+    >
+    &nbsp;·&nbsp; Smart Project Recommendations &nbsp;·&nbsp; Built with Flask
+    &amp; Scikit-learn
+  </footer>
+</main>
+{% endblock %}

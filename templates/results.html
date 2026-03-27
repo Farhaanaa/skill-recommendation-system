@@ -1,0 +1,515 @@
+{% extends "base.html" %} {% block title %}Your Recommendations — SkillMatch{%
+endblock %} {% block body %}
+<div class="app-layout">
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Menu</div>
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link">
+      <i class="fa-solid fa-gauge"></i> Dashboard
+    </a>
+    <a href="{{ url_for('profile') }}" class="sidebar-link active">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Account</div>
+    <a href="{{ url_for('logout') }}" class="sidebar-link">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+    </a>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main-content">
+    <!-- Page header -->
+    <div class="page-header" data-aos="fade-up">
+      <h1>Your Recommendations</h1>
+      <p>
+        Here are your top {{ recommendations|length }} project matches based on
+        your profile.
+        <a
+          href="{{ url_for('profile') }}"
+          style="color: var(--rose); font-weight: 600"
+        >
+          <i class="fa-solid fa-rotate-left" style="font-size: 0.8rem"></i>
+          Refine profile
+        </a>
+      </p>
+    </div>
+
+    <!-- Profile summary strip -->
+    <div
+      class="card"
+      style="
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+      "
+      data-aos="fade-up"
+    >
+      <i
+        class="fa-solid fa-user-circle"
+        style="color: var(--pink-deep); font-size: 1.4rem"
+      ></i>
+      <div style="flex: 1; min-width: 200px">
+        <div
+          style="
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-soft);
+            font-weight: 600;
+          "
+        >
+          Profile snapshot
+        </div>
+        <div
+          style="font-size: 0.9rem; color: var(--text-mid); margin-top: 0.2rem"
+        >
+          {% if profile.skills %}<strong style="color: var(--text-dark)"
+            >Skills:</strong
+          >
+          {{ profile.skills }} &nbsp;·&nbsp; {% endif %} {% if
+          profile.career_goal %}<strong style="color: var(--text-dark)"
+            >Goal:</strong
+          >
+          {{ profile.career_goal }} &nbsp;·&nbsp; {% endif %} {% if
+          profile.interests %}<strong style="color: var(--text-dark)"
+            >Interests:</strong
+          >
+          {{ profile.interests }}{% endif %}
+        </div>
+      </div>
+      <span
+        style="
+          background: var(--pink-light);
+          color: var(--rose);
+          font-size: 0.78rem;
+          font-weight: 600;
+          padding: 0.35rem 1rem;
+          border-radius: 999px;
+          border: 1px solid rgba(201, 112, 112, 0.22);
+        "
+      >
+        {{ recommendations|length }} matches found
+      </span>
+    </div>
+
+    <!-- No results -->
+    {% if not recommendations %}
+    <div style="text-align: center; padding: 5rem 1rem" data-aos="fade-up">
+      <i
+        class="fa-solid fa-magnifying-glass"
+        style="font-size: 3rem; color: var(--pink)"
+      ></i>
+      <h2 style="margin-top: 1.2rem; margin-bottom: 0.6rem">
+        No matches found
+      </h2>
+      <p style="color: var(--text-soft); margin-bottom: 1.8rem">
+        Try adding more skills or interests to your profile.
+      </p>
+      <a href="{{ url_for('profile') }}" class="btn btn-primary">
+        <i class="fa-solid fa-rotate-left"></i> Update Profile
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- ══ PROJECT CARDS ══ -->
+    {% for rec in recommendations %}
+    <div
+      class="card"
+      style="padding: 0; margin-bottom: 1.75rem; overflow: hidden"
+      data-aos="fade-up"
+      data-aos-delay="{{ loop.index0 * 80 }}"
+    >
+      <!-- Card top bar (rank + match %) -->
+      <div
+        style="
+          background: linear-gradient(
+            90deg,
+            var(--pink-light),
+            rgba(245, 213, 213, 0.4)
+          );
+          padding: 0.7rem 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(232, 160, 160, 0.18);
+        "
+      >
+        <span
+          style="
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--rose);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          "
+        >
+          <i class="fa-solid fa-trophy" style="font-size: 0.7rem"></i>
+          Match #{{ loop.index }}
+        </span>
+
+        <!-- Match % bar -->
+        <div style="display: flex; align-items: center; gap: 0.75rem">
+          <div class="progress-wrap" style="width: 120px">
+            <div
+              class="progress-bar"
+              data-width="{{ rec.match_pct }}"
+              style="
+                background: linear-gradient(
+                  90deg,
+                  var(--pink-deep),
+                  var(--rose)
+                );
+              "
+            ></div>
+          </div>
+          <span
+            style="
+              font-size: 0.82rem;
+              font-weight: 700;
+              color: var(--rose);
+              min-width: 36px;
+            "
+            >{{ rec.match_pct }}%</span
+          >
+        </div>
+      </div>
+
+      <!-- Card body -->
+      <div style="padding: 1.75rem">
+        <!-- Title row -->
+        <div
+          style="
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.9rem;
+          "
+        >
+          <div style="flex: 1; min-width: 200px">
+            <h2 style="font-size: 1.55rem; margin-bottom: 0.35rem">
+              {{ rec.title }}
+            </h2>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                flex-wrap: wrap;
+              "
+            >
+              <!-- Domain -->
+              <span style="font-size: 0.78rem; color: var(--text-soft)">
+                <i class="fa-solid fa-folder" style="font-size: 0.7rem"></i> {{
+                rec.domain }}
+              </span>
+              <!-- Difficulty badge -->
+              {% if rec.difficulty == 'Beginner' %}
+              <span class="badge badge-beginner">{{ rec.difficulty }}</span>
+              {% elif rec.difficulty == 'Intermediate' %}
+              <span class="badge badge-intermediate">{{ rec.difficulty }}</span>
+              {% else %}
+              <span class="badge badge-advanced">{{ rec.difficulty }}</span>
+              {% endif %}
+              <!-- Time -->
+              {% if rec.estimated_days %}
+              <span style="font-size: 0.78rem; color: var(--text-soft)">
+                <i class="fa-regular fa-clock" style="font-size: 0.7rem"></i>
+                ~{{ rec.estimated_days }} days
+              </span>
+              {% endif %}
+              <!-- User level -->
+              <span style="font-size: 0.78rem; color: var(--text-soft)">
+                <i class="fa-solid fa-signal" style="font-size: 0.7rem"></i>
+                Your level:
+                <strong style="color: var(--text-mid)"
+                  >{{ rec.user_level }}</strong
+                >
+              </span>
+            </div>
+          </div>
+
+          <!-- Bookmark & Feedback buttons -->
+          <div
+            style="display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap"
+          >
+            <form
+              method="POST"
+              action="{{ url_for('bookmark') }}"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="project_title"
+                value="{{ rec.title }}"
+              />
+              <input
+                type="hidden"
+                name="project_domain"
+                value="{{ rec.domain }}"
+              />
+              <button
+                type="submit"
+                class="btn btn-secondary btn-sm"
+                title="Save project"
+              >
+                <i class="fa-regular fa-bookmark"></i> Save
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="{{ url_for('feedback') }}"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="project_title"
+                value="{{ rec.title }}"
+              />
+              <input type="hidden" name="liked" value="true" />
+              <button type="submit" class="btn btn-ghost btn-sm" title="Like">
+                <i class="fa-regular fa-thumbs-up"></i>
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="{{ url_for('feedback') }}"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="project_title"
+                value="{{ rec.title }}"
+              />
+              <input type="hidden" name="liked" value="false" />
+              <button
+                type="submit"
+                class="btn btn-ghost btn-sm"
+                title="Dislike"
+              >
+                <i class="fa-regular fa-thumbs-down"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p
+          style="
+            color: var(--text-mid);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+          "
+        >
+          {{ rec.description }}
+        </p>
+
+        <!-- ✦ Why recommended (explanation) -->
+        <div
+          style="
+            background: var(--cream);
+            border-left: 3px solid var(--pink-deep);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.4rem;
+          "
+        >
+          <div
+            style="
+              font-size: 0.75rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.08em;
+              color: var(--pink-deep);
+              margin-bottom: 0.35rem;
+            "
+          >
+            <i class="fa-solid fa-lightbulb"></i> Why this project?
+          </div>
+          <p
+            style="
+              font-size: 0.88rem;
+              color: var(--text-mid);
+              line-height: 1.65;
+              margin: 0;
+            "
+          >
+            {{ rec.explanation | safe }}
+          </p>
+        </div>
+
+        <!-- Skills grid: matched + missing -->
+        <div class="grid-2" style="margin-bottom: 1.4rem">
+          <!-- Matched skills -->
+          <div>
+            <div
+              style="
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: #2e7d32;
+                margin-bottom: 0.55rem;
+              "
+            >
+              <i class="fa-solid fa-circle-check"></i> Skills you have
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem">
+              {% if rec.matched_skills %} {% for skill in rec.matched_skills %}
+              <span
+                class="badge badge-skill"
+                style="background: #e8f5e9; color: #2e7d32"
+                >{{ skill }}</span
+              >
+              {% endfor %} {% else %}
+              <span style="font-size: 0.82rem; color: var(--text-soft)"
+                >None matched yet</span
+              >
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Missing skills -->
+          <div>
+            <div
+              style="
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: #b71c1c;
+                margin-bottom: 0.55rem;
+              "
+            >
+              <i class="fa-solid fa-circle-exclamation"></i> Skills to learn
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem">
+              {% if rec.missing_skills %} {% for skill in rec.missing_skills %}
+              <span class="badge badge-missing">{{ skill }}</span>
+              {% endfor %} {% else %}
+              <span
+                style="font-size: 0.82rem; color: #2e7d32; font-weight: 600"
+              >
+                <i class="fa-solid fa-star"></i> You have all required skills!
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools & Tags row -->
+        <div style="margin-bottom: 1.4rem">
+          {% if rec.tools %}
+          <div style="margin-bottom: 0.6rem">
+            <span
+              style="
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--text-soft);
+              "
+            >
+              <i class="fa-solid fa-screwdriver-wrench"></i> Tools:
+            </span>
+            {% for tool in rec.tools.split(',') %}
+            <span class="badge badge-skill" style="margin-left: 0.25rem"
+              >{{ tool.strip() }}</span
+            >
+            {% endfor %}
+          </div>
+          {% endif %} {% if rec.career_alignment %}
+          <div>
+            <span
+              style="
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--text-soft);
+              "
+            >
+              <i class="fa-solid fa-briefcase"></i> Career:
+            </span>
+            <span
+              style="
+                font-size: 0.82rem;
+                color: var(--text-mid);
+                margin-left: 0.4rem;
+              "
+              >{{ rec.career_alignment }}</span
+            >
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Learning resource link -->
+        {% if rec.resources %}
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(232, 160, 160, 0.15);
+          "
+        >
+          <span style="font-size: 0.82rem; color: var(--text-soft)">
+            <i class="fa-solid fa-book-open"></i> Start learning:
+            <a
+              href="{{ rec.resources }}"
+              target="_blank"
+              rel="noopener"
+              style="color: var(--rose); font-weight: 600; margin-left: 0.3rem"
+            >
+              {{ rec.resources }}
+              <i
+                class="fa-solid fa-arrow-up-right-from-square"
+                style="font-size: 0.65rem"
+              ></i>
+            </a>
+          </span>
+          <span style="font-size: 0.78rem; color: var(--text-soft)">
+            Similarity score:
+            <strong style="color: var(--text-mid)"
+              >{{ (rec.similarity_score * 100) | round(1) }}%</strong
+            >
+          </span>
+        </div>
+        {% endif %}
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+    {% endfor %}
+
+    <!-- Bottom actions -->
+    {% if recommendations %}
+    <div
+      style="
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        padding: 1rem 0 3rem;
+        flex-wrap: wrap;
+      "
+      data-aos="fade-up"
+    >
+      <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+        <i class="fa-solid fa-rotate-left"></i> Try Again
+      </a>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+        <i class="fa-solid fa-gauge"></i> Go to Dashboard
+      </a>
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

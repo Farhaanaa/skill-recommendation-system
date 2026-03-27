@@ -1,18 +1,4 @@
-from flask import Flask
-from config import Config
-from models import db
-
-app = Flask(__name__)
-app.config.from_object(Config)
-db.init_app(app)
-
-with app.app_context():
-    db.create_all()
-    print("Database created successfully!")
-
-if __name__ == "__main__":
-    app.run(debug=True)
-    from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from config import Config
 from models import db, User, UserProfile, Bookmark, Feedback
 from recommender import get_recommendations
@@ -36,13 +22,12 @@ login_manager.login_message = "Please log in to continue."
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Create tables on first run
 with app.app_context():
     db.create_all()
 
 
 # ─────────────────────────────────────────────
-#  HOME / LANDING
+#  HOME
 # ─────────────────────────────────────────────
 @app.route("/")
 def index():
@@ -58,11 +43,10 @@ def signup():
         return redirect(url_for("dashboard"))
 
     if request.method == "POST":
-        username  = request.form.get("username", "").strip()
-        email     = request.form.get("email", "").strip()
-        password  = request.form.get("password", "").strip()
+        username = request.form.get("username", "").strip()
+        email    = request.form.get("email", "").strip()
+        password = request.form.get("password", "").strip()
 
-        # Basic validation
         if not username or not email or not password:
             flash("All fields are required.", "error")
             return render_template("signup.html")
@@ -75,9 +59,11 @@ def signup():
             flash("Username already taken.", "error")
             return render_template("signup.html")
 
-        # Create user
-        hashed_pw = generate_password_hash(password)
-        new_user  = User(username=username, email=email, password_hash=hashed_pw)
+        new_user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password)
+        )
         db.session.add(new_user)
         db.session.commit()
 
@@ -98,8 +84,7 @@ def login():
     if request.method == "POST":
         email    = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
-
-        user = User.query.filter_by(email=email).first()
+        user     = User.query.filter_by(email=email).first()
 
         if not user or not check_password_hash(user.password_hash, password):
             flash("Invalid email or password.", "error")
@@ -129,33 +114,27 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    # Get latest profile
     profile   = UserProfile.query.filter_by(user_id=current_user.id)\
                                   .order_by(UserProfile.created_at.desc()).first()
     bookmarks = Bookmark.query.filter_by(user_id=current_user.id)\
                                .order_by(Bookmark.saved_at.desc()).all()
 
-    # Quick stats
-    bookmark_count  = len(bookmarks)
-    profile_complete = profile is not None
-
     return render_template(
         "dashboard.html",
         profile=profile,
         bookmarks=bookmarks,
-        bookmark_count=bookmark_count,
-        profile_complete=profile_complete,
+        bookmark_count=len(bookmarks),
+        profile_complete=profile is not None,
     )
 
 
 # ─────────────────────────────────────────────
-#  PROFILE FORM  →  RECOMMENDATIONS
+#  PROFILE FORM → RECOMMENDATIONS
 # ─────────────────────────────────────────────
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
     if request.method == "POST":
-        # Pull every field from the form
         interests      = request.form.get("interests", "")
         qualification  = request.form.get("qualification", "")
         course         = request.form.get("course", "")
@@ -166,40 +145,40 @@ def profile():
         tools_known    = request.form.get("tools_known", "")
         what_they_know = request.form.get("what_they_know", "")
 
-        # Save / update profile in DB
+        # Save to DB
         new_profile = UserProfile(
-            user_id        = current_user.id,
-            interests      = interests,
-            qualification  = qualification,
-            course         = course,
-            career         = career,
-            career_goal    = career_goal,
-            skills         = skills,
-            certifications = certifications,
-            tools_known    = tools_known,
-            what_they_know = what_they_know,
+            user_id=current_user.id,
+            interests=interests,
+            qualification=qualification,
+            course=course,
+            career=career,
+            career_goal=career_goal,
+            skills=skills,
+            certifications=certifications,
+            tools_known=tools_known,
+            what_they_know=what_they_know,
         )
         db.session.add(new_profile)
         db.session.commit()
 
         # Run ML engine
         recommendations = get_recommendations(
-            interests      = interests,
-            qualification  = qualification,
-            course         = course,
-            career         = career,
-            career_goal    = career_goal,
-            skills         = skills,
-            certifications = certifications,
-            tools_known    = tools_known,
-            what_they_know = what_they_know,
-            top_n          = 5,
+            interests=interests,
+            qualification=qualification,
+            course=course,
+            career=career,
+            career_goal=career_goal,
+            skills=skills,
+            certifications=certifications,
+            tools_known=tools_known,
+            what_they_know=what_they_know,
+            top_n=5,
         )
 
         return render_template(
             "results.html",
-            recommendations = recommendations,
-            profile = {
+            recommendations=recommendations,
+            profile={
                 "interests": interests,
                 "qualification": qualification,
                 "course": course,
@@ -212,14 +191,13 @@ def profile():
             }
         )
 
-    # GET — show the form (pre-fill if profile exists)
     existing = UserProfile.query.filter_by(user_id=current_user.id)\
                                  .order_by(UserProfile.created_at.desc()).first()
     return render_template("profile.html", existing=existing)
 
 
 # ─────────────────────────────────────────────
-#  BOOKMARK A PROJECT
+#  BOOKMARK
 # ─────────────────────────────────────────────
 @app.route("/bookmark", methods=["POST"])
 @login_required
@@ -227,21 +205,19 @@ def bookmark():
     project_title  = request.form.get("project_title", "")
     project_domain = request.form.get("project_domain", "")
 
-    # Avoid duplicates
     exists = Bookmark.query.filter_by(
-        user_id       = current_user.id,
-        project_title = project_title
+        user_id=current_user.id,
+        project_title=project_title
     ).first()
 
     if not exists:
-        bm = Bookmark(
-            user_id        = current_user.id,
-            project_title  = project_title,
-            project_domain = project_domain,
-        )
-        db.session.add(bm)
+        db.session.add(Bookmark(
+            user_id=current_user.id,
+            project_title=project_title,
+            project_domain=project_domain,
+        ))
         db.session.commit()
-        flash(f"'{project_title}' saved to your bookmarks!", "success")
+        flash(f"'{project_title}' saved to bookmarks!", "success")
     else:
         flash("Already bookmarked.", "info")
 
@@ -265,20 +241,16 @@ def remove_bookmark(bookmark_id):
 
 
 # ─────────────────────────────────────────────
-#  FEEDBACK (like / dislike)
+#  FEEDBACK
 # ─────────────────────────────────────────────
 @app.route("/feedback", methods=["POST"])
 @login_required
 def feedback():
-    project_title = request.form.get("project_title", "")
-    liked         = request.form.get("liked") == "true"
-
-    fb = Feedback(
-        user_id       = current_user.id,
-        project_title = project_title,
-        liked         = liked,
-    )
-    db.session.add(fb)
+    db.session.add(Feedback(
+        user_id=current_user.id,
+        project_title=request.form.get("project_title", ""),
+        liked=request.form.get("liked") == "true",
+    ))
     db.session.commit()
     flash("Thanks for your feedback!", "success")
     return redirect(url_for("dashboard"))
